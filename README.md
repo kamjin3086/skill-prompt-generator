@@ -1,8 +1,12 @@
 # Skill Prompt Generator - 基于Skills的智能提示词生成系统
 
 > 🎉 **v2.0 已发布！** 新增跨domain查询和设计系统集成。[查看升级指南 →](UPGRADE_GUIDE_v2.0.md)
+>
+> 🆕 **Codex 适配完成！** 支持 OpenAI Codex CLI 使用全部 Skills。[查看 Codex 指南 →](.codex/codex.md)
 
-**一个 Claude Code Skills 项目**，通过12个专业领域Skills，基于Universal Elements Library（1246+元素）生成高质量AI图像提示词。
+**一个 Claude Code Skills 项目**，通过12个专业领域Skills，基于Universal Elements Library（1246元素）和社区提示词语料库（675条 source prompts）生成高质量AI图像提示词。
+
+同时支持 **Claude Code** 和 **OpenAI Codex CLI** 两种 Agent 平台。
 
 ## 🆕 v2.0 新特性
 
@@ -21,14 +25,15 @@
 - 🎨 **Skills优先**：用户通过调用Skills生成提示词，不直接调用Python
 - 🧠 **智能路由**：自动识别领域（人像/艺术/设计/产品/视频），调用对应专家
 - 📦 **12个专业Skills**：每个领域有独立的专家Skill
-- 💾 **统一数据源**：所有Skills共享Universal Elements Library（1140+元素）
+- 💾 **统一数据源**：所有Skills共享Universal Elements Library（1246元素）+ 社区语料库（675条）
 
 ## ✨ 核心特性
 
 ### 🎯 Skills系统（核心）
-- **12个专业领域Skills**：intelligent-prompt-generator, art-master, design-master, product-master, video-master, universal-learner等
+- **12个专业领域Skills**：intelligent-prompt-generator, art-master, design-master, product-master, video-master, universal-learner, prompt-analyzer, prompt-extractor, prompt-generator, prompt-master, prompt-xray, domain-classifier, prompt-writer 等
 - **智能领域路由**：自动识别用户需求，调用对应专家
 - **模块化架构**：每个Skill独立工作，协同配合
+- **🆕 Codex 适配**：通过 `.codex/` 目录同时支持 OpenAI Codex CLI（由 @Felictycf 贡献）
 
 ### 🆕 v2.0 三种生成模式
 - **Portrait（人像）** - 纯人像摄影，使用portrait domain（502元素）
@@ -44,18 +49,24 @@
 - **🆕 变量采样**：参数化元素，智能避免重复
 
 ### 📦 双轨制系统
-- **元素级生成**：从1246+个元素中智能选择组合
+- **元素级生成**：从1246个元素中智能选择组合
 - **模板级生成**：完整设计系统模板（如Apple PPT模板）
+- **🆕 社区语料库**：675条社区 source prompts（260+创作者，覆盖海报/人像/UI/产品/电商/广告创意/角色设计等7大类）
 - **🆕 设计变量库**：37种配色方案 + 边框 + 装饰元素
 
 ### 📦 支持领域
 - 📷 **portrait** - 人像摄影（502个元素）
-- 🎨 **design** - 平面设计（155个元素，含5个完整模板）
-- 🏠 **interior** - 室内设计
-- 📦 **product** - 产品摄影（77个元素）
-- 🎭 **art** - 艺术风格（51个元素）
+- 🎨 **design** - 平面设计（166个元素，含5个完整模板）
+- 🏠 **interior** - 室内设计（79个元素）
+- 📦 **product** - 产品摄影（78个元素）
+- 🎭 **art** - 艺术风格（70个元素）
 - 🎬 **video** - 视频生成（49个元素）
-- 📸 **common** - 通用摄影技术（205个元素）
+- 📸 **common** - 通用摄影技术（208个元素）
+- 🎨 **creative** - 创意综合（37个元素）
+- 🎬 **scenario** - 场景描述（34个元素）
+- 🔧 **utility** - 工具型提示词（10个元素）
+- 📝 **prompt_writing** - 提示词写作（9个元素）
+- 🏡 **lifestyle** - 生活方式（4个元素）
 - 🆕 **跨domain** - 自动组合多个领域（995个元素）
 - 🆕 **设计变量** - 配色+边框+装饰（20万+组合）
 
@@ -195,7 +206,7 @@ gen.close()
 
 ```
 .
-├── .claude/                       # ⭐ Skills系统（核心）
+├── .claude/                       # ⭐ Skills系统（Claude Code）
 │   ├── CLAUDE.md                  # 项目规则和Skill路由指南
 │   └── skills/                    # 12个专业领域Skills
 │       ├── intelligent-prompt-generator/  # 人像提示词专家
@@ -210,6 +221,25 @@ gen.close()
 │       ├── prompt-master/         # 主控调度
 │       ├── prompt-xray/           # X-Ray分析
 │       └── domain-classifier/     # 领域分类
+│
+├── .codex/                        # ⭐ Skills系统（OpenAI Codex CLI）🆕
+│   ├── codex.md                   # Codex 入口指南
+│   ├── SKILL_ROUTING_GUIDE.md     # Skill 路由规则
+│   ├── learner.md                 # 学习模块
+│   └── skills/                    # 12个Codex版Skills（与.claude/对应）
+│       ├── intelligent-prompt-generator/
+│       ├── prompt-master/         # 含 analyzer/builder/extractor/learner/optimizer/recommender
+│       ├── prompt-extractor/      # 含 Python preprocessor + 测试
+│       ├── prompt-xray/           # 含 xray_helper.py
+│       ├── universal-learner/     # 含 domain_classifier/element_extractor/tagger/library_updater
+│       ├── product-master/        # 含 builder + grid_collage 模块
+│       ├── art-master/
+│       ├── design-master/
+│       ├── domain-classifier/
+│       ├── prompt-analyzer/
+│       ├── prompt-generator/
+│       ├── video-master/
+│       └── ...
 │
 ├── 🆕 core/                       # v2.0 核心模块
 │   ├── cross_domain_generator.py  # 统一生成接口（主入口）
@@ -234,20 +264,19 @@ gen.close()
 ├── prompt_framework.yaml          # 人像框架定义
 │
 ├── extracted_results/
-│   └── elements.db                # Universal Elements Library (1246+元素)
+│   └── elements.db                # Universal Elements Library (1246元素) + source_prompts (675条)
 │
 ├── README_v2.0.md                 # 🆕 v2.0快速开始
 ├── UPGRADE_GUIDE_v2.0.md          # 🆕 v2.0升级指南
-├── requirements.txt               # Python依赖
 └── README.md                      # 项目文档（本文件）
 ```
 
 **架构说明**：
-- **用户层**：通过Claude Code调用Skills
-- **Skills层**：12个专业领域专家（.claude/skills/）
+- **用户层**：通过 Claude Code 或 Codex CLI 调用 Skills
+- **Skills层**：12个专业领域专家（`.claude/skills/` + `.codex/skills/`）
 - **🆕 v2.0引擎层**：core/ 模块（跨domain + 设计系统）
 - **v1.0引擎层**：Python引擎支持Skills运行（完全保留）
-- **数据层**：Universal Elements Library（1246+元素）+ 设计变量库
+- **数据层**：Universal Elements Library（1246元素）+ 社区语料库（675条）+ 设计变量库
 
 ## 🎨 使用示例
 
@@ -350,7 +379,7 @@ Border style: box_shadow, round corners 20px...
 
 ### 1. 元素库系统
 - **1140+个可复用元素**
-- 7大领域分类
+- 12大领域分类
 - 复用性评分（1-10）
 - SQLite数据库存储
 
@@ -374,17 +403,30 @@ Border style: box_shadow, round corners 20px...
 
 ## 📊 数据库统计
 
-### v2.0 (当前版本)
-- **总元素数**: 1246+
+### 元素库（当前版本）
+- **总元素数**: 1246
 - **Portrait领域**: 502个（人像专用）
-- **Design领域**: 155个（平面设计，含5个完整模板）
-- **Product领域**: 77个（产品摄影）
-- **Art领域**: 51个（艺术风格）
+- **Common领域**: 208个（通用技术）
+- **Design领域**: 166个（平面设计，含5个完整模板）
+- **Interior领域**: 79个（室内设计）
+- **Product领域**: 78个（产品摄影）
+- **Art领域**: 70个（艺术风格）
 - **Video领域**: 49个（视频生成）
-- **Common领域**: 205个（通用技术）
+- **Creative领域**: 37个（创意综合）
+- **Scenario领域**: 34个（场景描述）
+- **Utility领域**: 10个（工具型提示词）
+- **Prompt Writing领域**: 9个（提示词写作）
+- **Lifestyle领域**: 4个（生活方式）
 - **跨domain可用**: 995个（组合使用）
 - **设计变量**: 37种配色 + 边框 + 装饰（20万+组合）
 - **完整模板**: 5个（Apple、Material Design、Fluent Design等）
+
+### 社区语料库 🆕
+- **Source Prompts 总计**: 675条
+- **已学习（completed）**: 246条
+- **待处理（pending + metadata_only）**: 429条
+- **覆盖类别**: 海报设计(163)、人像摄影(112)、UI设计(82)、综合创意(65)、产品摄影(7) 等
+- **创作者来源**: 260+ 位社区创作者
 
 ### 性能提升（v1.0 → v2.0）
 - 数据库利用率：40.3% → 79.9% ⬆️ **+98.2%**
@@ -442,6 +484,9 @@ template = {
 ## 🤝 贡献
 
 欢迎提交Issue和Pull Request！
+
+### 贡献者
+- **@Felictycf** — Codex CLI 完整适配（12个 Skills 迁移 + 路由系统 + prompt-xray/py + prompt-extractor/preprocessor）
 
 ## 📄 License
 
